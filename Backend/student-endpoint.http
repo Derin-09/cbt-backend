@@ -1,0 +1,13 @@
+@base_address = http://localhost:3000/api/student
+
+GET {{base_address}}
+
+###
+POST {{base_address}}
+Content-Type: application/json
+
+{
+    "UserId": 1,
+    "MatricNo": "0000/1234",
+    "Department": "Sciences"
+}

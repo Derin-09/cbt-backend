@@ -1,0 +1,12 @@
+@base_address = http://localhost:3000/api/auth
+
+GET {{base_address}}
+
+###
+POST {{base_address}}
+Content-Type: application/json
+
+{
+    "Role": "Student",
+    "Password": "Student1!"
+}
