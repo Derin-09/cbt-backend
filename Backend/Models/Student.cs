@@ -10,8 +10,12 @@ public class Student
     public int UserId { get; set; }
     [Required]
     public string MatricNo {get; set;} = string.Empty; 
+
+    [Required]
+    public string FullName {get; set;} = string.Empty; 
+
     [AllowNull]
-    public User User { get; set; }
+    public User? User { get; set; }
     public string Department { get; set; } = string.Empty;
 
 }

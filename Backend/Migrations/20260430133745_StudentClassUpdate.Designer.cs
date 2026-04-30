@@ -2,6 +2,7 @@
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430133745_StudentClassUpdate")]
+    partial class StudentClassUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
@@ -23,10 +26,6 @@ namespace Backend.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -138,10 +137,6 @@ namespace Backend.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Department")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

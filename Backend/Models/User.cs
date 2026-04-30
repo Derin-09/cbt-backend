@@ -16,7 +16,7 @@ public class User
         ErrorMessage = "Password must contain upper, lower, number, and special character")]
     public string Password { get; set; } = string.Empty;
     [AllowNull]
-    public Student Student { get; set; } 
+    public Student? Student { get; set; } 
      [AllowNull]
-    public Admin Admin { get; set; }
+    public Admin? Admin { get; set; }
 }

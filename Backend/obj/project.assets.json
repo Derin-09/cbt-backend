@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net10.0": {
+      "BCrypt.Net-Next/4.1.0": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/BCrypt.Net-Next.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/BCrypt.Net-Next.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Humanizer.Core/2.14.1": {
         "type": "package",
         "compile": {
@@ -11,6 +24,22 @@
         },
         "runtime": {
           "lib/net6.0/Humanizer.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Identity.EntityFrameworkCore/10.0.7": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.7"
+        },
+        "compile": {
+          "lib/net10.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll": {
             "related": ".xml"
           }
         }
@@ -843,6 +872,35 @@
     }
   },
   "libraries": {
+    "BCrypt.Net-Next/4.1.0": {
+      "sha512": "5YT3DKllmtkyW68PjURu/V1TOe4MKiByKwsRNVcfYE1S5KuFTeozdmKzyNzolKiQF391OXCaQtINvYT3j1ERzQ==",
+      "type": "package",
+      "path": "bcrypt.net-next/4.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "bcrypt.net-next.4.1.0.nupkg.sha512",
+        "bcrypt.net-next.nuspec",
+        "ico.png",
+        "lib/net10.0/BCrypt.Net-Next.dll",
+        "lib/net10.0/BCrypt.Net-Next.xml",
+        "lib/net20/BCrypt.Net-Next.dll",
+        "lib/net20/BCrypt.Net-Next.xml",
+        "lib/net35/BCrypt.Net-Next.dll",
+        "lib/net35/BCrypt.Net-Next.xml",
+        "lib/net462/BCrypt.Net-Next.dll",
+        "lib/net462/BCrypt.Net-Next.xml",
+        "lib/net472/BCrypt.Net-Next.dll",
+        "lib/net472/BCrypt.Net-Next.xml",
+        "lib/net48/BCrypt.Net-Next.dll",
+        "lib/net48/BCrypt.Net-Next.xml",
+        "lib/netstandard2.0/BCrypt.Net-Next.dll",
+        "lib/netstandard2.0/BCrypt.Net-Next.xml",
+        "lib/netstandard2.1/BCrypt.Net-Next.dll",
+        "lib/netstandard2.1/BCrypt.Net-Next.xml",
+        "readme.md"
+      ]
+    },
     "Humanizer.Core/2.14.1": {
       "sha512": "lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw==",
       "type": "package",
@@ -859,6 +917,22 @@
         "lib/netstandard2.0/Humanizer.dll",
         "lib/netstandard2.0/Humanizer.xml",
         "logo.png"
+      ]
+    },
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore/10.0.7": {
+      "sha512": "WAMNMV7m019wBaem9YAyK+nsR6r5ixBL/kOPybO9QhEkwG4dOeVG3vvTTkI5I6q6fp5+MN6IuYxxV/2HYiI9vw==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.identity.entityframeworkcore/10.0.7",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net10.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll",
+        "lib/net10.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.xml",
+        "microsoft.aspnetcore.identity.entityframeworkcore.10.0.7.nupkg.sha512",
+        "microsoft.aspnetcore.identity.entityframeworkcore.nuspec"
       ]
     },
     "Microsoft.AspNetCore.OpenApi/10.0.5": {
@@ -2503,6 +2577,8 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "BCrypt.Net-Next >= 4.1.0",
+      "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 10.0.7",
       "Microsoft.AspNetCore.OpenApi >= 10.0.5",
       "Microsoft.EntityFrameworkCore >= 10.0.7",
       "Microsoft.EntityFrameworkCore.Design >= 10.0.7",
@@ -2560,6 +2636,14 @@
       "net10.0": {
         "targetAlias": "net10.0",
         "dependencies": {
+          "BCrypt.Net-Next": {
+            "target": "Package",
+            "version": "[4.1.0, )"
+          },
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+            "target": "Package",
+            "version": "[10.0.7, )"
+          },
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
             "version": "[10.0.5, )"

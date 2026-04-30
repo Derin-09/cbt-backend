@@ -29,11 +29,30 @@ namespace Backend.Controllers
             }
         }
 
+         [HttpPost("login")]
+        public async Task<IActionResult> LoginUser(User user)
+        {
+            try
+            { 
+                // var savedUser = await _context.Users.FirstOrDefaultAsync()
+                // var unhashedPassword = BCrypt.Net.BCrypt.Verify(user.Password, )
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                return Ok("Created Successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateUser(User user)
         {
             try
             {
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                user.Password = hashedPassword;
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
                 return Ok("Created Successfully");

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\HP\\Documents\\cbt-environment\\backend\\Backend.csproj": {}
+    "C:\\Users\\HP\\Documents\\cbt-environment\\Backend\\Backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\HP\\Documents\\cbt-environment\\backend\\Backend.csproj": {
+    "C:\\Users\\HP\\Documents\\cbt-environment\\Backend\\Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\HP\\Documents\\cbt-environment\\backend\\Backend.csproj",
+        "projectUniqueName": "C:\\Users\\HP\\Documents\\cbt-environment\\Backend\\Backend.csproj",
         "projectName": "Backend",
-        "projectPath": "C:\\Users\\HP\\Documents\\cbt-environment\\backend\\Backend.csproj",
+        "projectPath": "C:\\Users\\HP\\Documents\\cbt-environment\\Backend\\Backend.csproj",
         "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\HP\\Documents\\cbt-environment\\backend\\obj\\",
+        "outputPath": "C:\\Users\\HP\\Documents\\cbt-environment\\Backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -50,6 +50,14 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[10.0.7, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[10.0.5, )"
