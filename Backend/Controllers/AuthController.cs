@@ -1,5 +1,7 @@
 using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,106 +17,57 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        // [HttpGet]
-        // public async Task<IActionResult> GetUsers()
-        // {
-        //     try
-        //     {
-        //         var users = await _context.Users.Include(u => u.Student).Include(u => u.Admin).ToListAsync();
-        //         return Ok(users);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //     }
-        // }
 
-        //  [HttpPost("login")]
-        // public async Task<IActionResult> LoginUser(User user)
-        // {
-        //     try
-        //     { 
-        //         // var savedUser = await _context.Users.FirstOrDefaultAsync()
-        //         // var unhashedPassword = BCrypt.Net.BCrypt.Verify(user.Password, )
-        //         _context.Users.Add(user);
-        //         await _context.SaveChangesAsync();
-        //         return Ok("Created Successfully");
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //     }
-        // }
+        [HttpPost("register/admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody] AuthService.RegisterAdminRequest request, [FromServices] UserManager<AppUser> userManager, AppDbContext dbContext)
+        {
+            var result = await AuthService.RegisterAdminAsync(request, userManager, dbContext);
+            if (result is Microsoft.AspNetCore.Http.HttpResults.Ok)
+                return Ok();
+            if (result is Microsoft.AspNetCore.Http.HttpResults.BadRequest badRequest)
+                return BadRequest(badRequest);
+            // Add more mappings as needed
+            return StatusCode(500, "Unknown result type");
+        }
 
-        // [HttpPost]
-        // public async Task<IActionResult> CreateUser(User user)
-        // {
-        //     try
-        //     {
-        //         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
-        //         user.Password = hashedPassword;
-        //         _context.Users.Add(user);
-        //         await _context.SaveChangesAsync();
-        //         return Ok("Created Successfully");
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //     }
-        // }
-        // [HttpGet("{id:int}")]
-        // public async Task<IActionResult> GetUser(int id)
-        // {
-        //     try
-        //     {
-        //     var user = await _context.Users.Include(u => u.Student)
-        //     .Include(u => u.Admin).FirstOrDefaultAsync(u => u.Id == id);
-        //         return Ok(user);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //     }
-        // }
-        // [HttpPut("{id:int}")]
-        // public async Task<IActionResult> UpdateUser([FromBody] User user, int id)
-        // {
-        //     try
-        //     {
-        //         if (user.Id != id)
-        //         {
-        //             return BadRequest();
-        //         }
-        //         if (!await _context.Users.AnyAsync(u => user.Id == u.Id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         _context.Users.Update(user);
-        //         await _context.SaveChangesAsync();
-        //         return NoContent();
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //     }
-        // }
-        // [HttpDelete("{id:int}")]
-        // public async Task<IActionResult> DeleteUser(int id)
-        // {
-        //     try
-        //     {
-        //         var user = await _context.Users.FindAsync(id);
-        //         if (user is null)
-        //         {
-        //             return NotFound();
-        //         }
-        //         _context.Users.Remove(user);
-        //         return Ok("Deleted Successfully");
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //     }
-        // }
+        [HttpPost("register/student")]
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = Backend.Models.Roles.Admin)]
+        public async Task<IActionResult> RegisterUser([FromBody] AuthService.RegisterUserRequest request, [FromServices] UserManager<AppUser> userManager, AppDbContext dbContext)
+        {
+            var result = await AuthService.RegisterUserAsync(request, userManager, dbContext);
+            if (result is Microsoft.AspNetCore.Http.HttpResults.Ok)
+                return Ok();
+            if (result is Microsoft.AspNetCore.Http.HttpResults.BadRequest badRequest)
+                return BadRequest(badRequest);
+            // Add more mappings as needed
+            return StatusCode(500, "Unknown result type");
+        }
+
+        [HttpPost("login/student")]
+
+        public async Task<IActionResult> LoginUser([FromBody] AuthService.LoginUserRequest request, [FromServices] UserManager<AppUser> userManager)
+        {
+            var result = await AuthService.LoginUserAsync(request, userManager);
+            if (result is Microsoft.AspNetCore.Http.HttpResults.Ok)
+                return Ok();
+            if (result is Microsoft.AspNetCore.Http.HttpResults.BadRequest badRequest)
+                return BadRequest(badRequest);
+            // Add more mappings as needed
+            return StatusCode(500, "Unknown result type");
+        }
+
+        [HttpPost("login/admin")]
+
+        public async Task<IActionResult> LoginAmin([FromBody] AuthService.LoginAdminRequest request, [FromServices] UserManager<AppUser> userManager)
+        {
+            var result = await AuthService.LoginAdminAsync(request, userManager);
+            if (result is Microsoft.AspNetCore.Http.HttpResults.Ok)
+                return Ok();
+            if (result is Microsoft.AspNetCore.Http.HttpResults.BadRequest badRequest)
+                return BadRequest(badRequest);
+            // Add more mappings as needed
+            return StatusCode(500, "Unknown result type");
+        }
+
     }
 }

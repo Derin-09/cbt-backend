@@ -5,15 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Models;
 
-// public class AppDbContext : DbContext
-// {
-    // public AppDbContext(DbContextOptions<AppDbContext> options) : base (options)
-    // {
-
-    // }
-
-    // public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
-
     public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<AppUser>(options)
     {
         public DbSet<User> AppMembers { get; set;}
@@ -34,4 +25,3 @@ namespace Backend.Models;
         public string? Position { get; set; }
     }
   
-// }

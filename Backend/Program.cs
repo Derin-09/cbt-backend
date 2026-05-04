@@ -45,8 +45,7 @@ if (app.Environment.IsDevelopment())
     }
 }
 
-RegisterAdmin.MapEndpoints(app);
-RegisterUser.MapEndpoints(app);
+
 
 app.UseHttpsRedirection();
 

@@ -1,0 +1,23 @@
+@base_address = http://localhost:3000/api/Auth
+
+# Register Admin
+POST {{base_address}}/register/admin
+Content-Type: application/json
+
+{
+	"fullName": "Admin User",
+	"password": "AdminPassword123!",
+	"position": "Principal",
+	"email": "admin@example.com"
+}
+
+###
+POST {{base_address}}/register/student
+Content-Type: application/json
+
+{
+	"fullName": "Student User",
+	"password": "StudentPassword123!",
+	"department": "Commercial",
+	"matricNo": "0000/1237"
+}

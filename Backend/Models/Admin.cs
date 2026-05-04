@@ -7,7 +7,7 @@ namespace Backend.Models;
 public class Admin
 {
     public int Id { get; set; }
-    public int UserId { get; set; }
+    public string AppUserId { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     
     [Required]
@@ -15,6 +15,6 @@ public class Admin
     public string Position { get; set; } = string.Empty;
 
     [AllowNull]
-    public User? User { get; set; }
+    public AppUser? User { get; set; }
     
 }

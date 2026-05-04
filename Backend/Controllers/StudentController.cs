@@ -16,13 +16,23 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> GetStudents()
         {
             try
             {
-                var students = await _context.Students.Include(s => s.User).ToListAsync();
+                var students = await _context.Students.Include(s => s.AppUser)
+                    .Select(s => new StudentDto
+                    {
+                        Id = s.Id,
+                        MatricNo = s.MatricNo,
+                        FullName = s.FullName,
+                        Department = s.Department,
+                        UserName = s.AppUser != null ? s.AppUser.UserName : null,
+                        Email = s.AppUser != null ? s.AppUser.Email : null
+                    })
+                    .ToListAsync();
                 return Ok(students);
             }
             catch (Exception ex)
@@ -50,7 +60,18 @@ namespace Backend.Controllers
         {
             try
             {
-                var student = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.Id == id);
+                var student = await _context.Students.Include(s => s.AppUser)
+                    .Where(s => s.Id == id)
+                    .Select(s => new StudentDto
+                    {
+                        Id = s.Id,
+                        MatricNo = s.MatricNo,
+                        FullName = s.FullName,
+                        Department = s.Department,
+                        UserName = s.AppUser != null ? s.AppUser.UserName : null,
+                        Email = s.AppUser != null ? s.AppUser.Email : null
+                    })
+                    .FirstOrDefaultAsync();
                 if (student is null)
                 {
                     return NotFound();
@@ -62,6 +83,18 @@ namespace Backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+        // DTO for Student output
+        public class StudentDto
+        {
+            public int Id { get; set; }
+            public string? MatricNo { get; set; }
+            public string? FullName { get; set; }
+            public string? Department { get; set; }
+            public string? UserName { get; set; }
+            public string? Email { get; set; }
+        }
+        
+        
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateStudent([FromBody] Student student, int id)
         {
