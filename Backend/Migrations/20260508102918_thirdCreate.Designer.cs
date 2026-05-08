@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260502124038_AuthFix")]
-    partial class AuthFix
+    [Migration("20260508102918_thirdCreate")]
+    partial class thirdCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,6 +26,10 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -38,13 +42,9 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("AppUserId");
 
                     b.ToTable("Admins");
                 });
@@ -196,8 +196,28 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ExamId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("OptionA")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OptionB")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OptionC")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OptionD")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Options")
                         .IsRequired()
@@ -222,6 +242,10 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Department")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -234,13 +258,9 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("AppUserId");
 
                     b.ToTable("Students");
                 });
@@ -275,6 +295,9 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -284,7 +307,14 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("StudentId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("StudentId");
 
                     b.ToTable("AppMembers");
                 });
@@ -419,9 +449,9 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Admin", b =>
                 {
-                    b.HasOne("Backend.Models.User", "User")
-                        .WithOne("Admin")
-                        .HasForeignKey("Backend.Models.Admin", "UserId")
+                    b.HasOne("Backend.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -430,13 +460,28 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Student", b =>
                 {
-                    b.HasOne("Backend.Models.User", "User")
-                        .WithOne("Student")
-                        .HasForeignKey("Backend.Models.Student", "UserId")
+                    b.HasOne("Backend.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("AppUser");
+                });
+
+            modelBuilder.Entity("Backend.Models.User", b =>
+                {
+                    b.HasOne("Backend.Models.Admin", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId");
+
+                    b.HasOne("Backend.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId");
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -488,13 +533,6 @@ namespace Backend.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Backend.Models.User", b =>
-                {
-                    b.Navigation("Admin");
-
-                    b.Navigation("Student");
                 });
 #pragma warning restore 612, 618
         }

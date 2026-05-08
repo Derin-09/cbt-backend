@@ -1,0 +1,23 @@
+@base_address = http://localhost:3000/api/questions
+
+POST {{base_address}}/import/mathematics
+
+###
+POST {{base_address}}/import/science
+###
+POST {{base_address}}/import/computer-science
+###
+POST {{base_address}}/import/history
+###
+POST {{base_address}}/import/art   
+
+###
+GET {{base_address}}/mathematics
+###
+GET {{base_address}}/science
+###
+GET {{base_address}}/computer-science
+###
+GET {{base_address}}/history
+###
+GET {{base_address}}/art
