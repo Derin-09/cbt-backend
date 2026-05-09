@@ -1,4 +1,4 @@
-@base_address = http://localhost:3000/api/auth
+@base_address = http://localhost:3000/api/Auth
 
 GET {{base_address}}
 
@@ -9,4 +9,25 @@ Content-Type: application/json
 {
     "Role": "Student",
     "Password": "Student1!"
+}
+
+###
+POST {{base_address}}/register/admin
+Content-Type: application/json
+
+{
+  "fullName": "Dr AyoAde Sanni",
+  "password": "Ayoade00!",
+  "position": "Science Lecturer",
+  "email": "ayoadesanni@gmail.com"
+}
+
+
+###
+POST {{base_address}}/login/admin
+Content-Type: application/json
+
+{
+  "email": "ayoadesanni@gmail.com",
+  "password": "Ayoade00!"
 }

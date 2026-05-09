@@ -1,3 +1,4 @@
+
 using System;
 
 namespace Backend.Services;
@@ -125,5 +126,50 @@ public class AuthService
 		return Results.Ok(admins);
 	}
 
+	public class AdminDto
+	{
+		public int Id { get; set; }
+		public string? FullName { get; set; }
+		public string? Position { get; set; }
+		public string? Email { get; set; }
+	}
 
+	public class StudentDto
+	{
+		public int Id { get; set; }
+		public string? MatricNo { get; set; }
+		public string? FullName { get; set; }
+		public string? Department { get; set; }
+		public string? UserName { get; set; }
+		public string? Email { get; set; }
+	}
+	public static async Task<AdminDto?> GetAdminByIdAsync(int id, AppDbContext dbContext)
+	{
+		return await dbContext.Admins.Include(s => s.AppUser)
+			.Where(s => s.Id == id)
+			.Select(s => new AdminDto
+			{
+				Id = s.Id,
+				FullName = s.FullName,
+				Position = s.Position,
+				Email = s.AppUser != null ? s.AppUser.Email : null
+			})
+			.FirstOrDefaultAsync();
+	}
+
+	public static async Task<StudentDto?> GetStudentByIdAsync(int id, AppDbContext dbContext)
+	{
+		return await dbContext.Students.Include(s => s.AppUser)
+			.Where(s => s.Id == id)
+			.Select(s => new StudentDto
+			{
+				Id = s.Id,
+				MatricNo = s.MatricNo,
+				FullName = s.FullName,
+				Department = s.Department,
+				UserName = s.AppUser != null ? s.AppUser.UserName : null,
+				Email = s.AppUser != null ? s.AppUser.Email : null
+			})
+			.FirstOrDefaultAsync();
+	}
 }

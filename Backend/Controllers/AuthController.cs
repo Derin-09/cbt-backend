@@ -58,7 +58,7 @@ namespace Backend.Controllers
 
         [HttpPost("login/admin")]
 
-        public async Task<IActionResult> LoginAmin([FromBody] AuthService.LoginAdminRequest request, [FromServices] UserManager<AppUser> userManager)
+        public async Task<IActionResult> LoginAdmin([FromBody] AuthService.LoginAdminRequest request, [FromServices] UserManager<AppUser> userManager)
         {
             var result = await AuthService.LoginAdminAsync(request, userManager);
             if (result is Microsoft.AspNetCore.Http.HttpResults.Ok)
@@ -68,6 +68,52 @@ namespace Backend.Controllers
             // Add more mappings as needed
             return StatusCode(500, "Unknown result type");
         }
+
+       public class AdminDto
+        {
+            public int Id { get; set; }
+            public string? FullName { get; set; }
+            public string? Position { get; set; }
+            public string? Email { get; set; }
+        }
+        [HttpGet("admin/{id:int}")]
+        public async Task<IActionResult> GetAdmin(int id)
+        {
+            try
+            {
+                var admin = await AuthService.GetAdminByIdAsync(id, _context);
+                if (admin is null)
+                {
+                    return NotFound();
+                }
+                return Ok(admin);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
+        [HttpGet("student/{id:int}")]
+        public async Task<IActionResult> GetStudent(int id)
+        {
+            try
+            {
+                var student = await AuthService.GetStudentByIdAsync(id, _context);
+                if (student is null)
+                {
+                    return NotFound();
+                }
+                return Ok(student);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
 
     }
 }
