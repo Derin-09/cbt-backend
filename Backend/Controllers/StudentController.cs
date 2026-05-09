@@ -41,6 +41,46 @@ namespace Backend.Controllers
             }
         }
 
+        [HttpGet("student-details/{id:int}")]
+         [Microsoft.AspNetCore.Authorization.Authorize(Roles = Backend.Models.Roles.Admin)]
+        public async Task<IActionResult> GetStudentDetails(int id)
+        {
+            try
+            {
+                var student = await _context.Students.Include(s => s.AppUser)
+                    .Where(s => s.Id == id)
+                    .Select(s => new StudentDto
+                    {
+                        Id = s.Id,
+                        MatricNo = s.MatricNo,
+                        FullName = s.FullName,
+                        Department = s.Department,
+                        UserName = s.AppUser != null ? s.AppUser.UserName : null,
+                        Email = s.AppUser != null ? s.AppUser.Email : null
+                    })
+                    .FirstOrDefaultAsync();
+                var examAssignments = await _context.ExamAssignments.Where(ea => ea.StudentId == id).ToListAsync();
+                var assignedExams = new List<Exam>();
+                if (student is null)
+                {
+                    return NotFound();
+                }
+                foreach (var assignment in examAssignments)
+                {
+                    var exam = await _context.Exams.FindAsync(assignment.ExamId);
+                    if (exam != null)
+                    {
+                        assignedExams.Add(exam);
+                    }
+                }
+                return Ok(new { Student = student, AssignedExams = assignedExams });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateStudent(Student student)
         {
@@ -117,6 +157,14 @@ namespace Backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+        [HttpPost("assign-studentTo-exam")]
+        public async Task<IActionResult> AssignStudentToExam([FromBody] ExamAssignment examAssignment)
+        {
+            await _context.ExamAssignments.AddAsync(examAssignment);
+            await _context.SaveChangesAsync();
+            return Ok("Assigned Successfully");
+        }
+
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteStudent(int id)
         {

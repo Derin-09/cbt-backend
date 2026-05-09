@@ -47,12 +47,12 @@ namespace Backend.Controllers
                     score++;
                 }
             }
-
+            var finalScore = (int)((double)score / submissionDto.Answers.Count * 100);
             var submission = new Submission
             {
                 ExamId = submissionDto.ExamId,
                 StudentId = submissionDto.StudentId,
-                Score = score,
+                Score = finalScore,
                 SubmittedAt = DateTime.UtcNow.ToString("o")
             };
             _context.Submissions.Add(submission);
