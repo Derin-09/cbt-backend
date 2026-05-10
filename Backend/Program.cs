@@ -70,18 +70,6 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
-}
-
-    app.UseSwagger();
-    app.UseSwaggerUI();
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
 
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     if (!await roleManager.RoleExistsAsync(Roles.Admin))
@@ -92,6 +80,14 @@ if (app.Environment.IsDevelopment())
     {
         await roleManager.CreateAsync(new IdentityRole(Roles.Student));
     }
+}
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
 }
 
 if (app.Environment.IsDevelopment())
