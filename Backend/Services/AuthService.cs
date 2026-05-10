@@ -35,7 +35,26 @@ public class AuthService
 			Position = request.Position
 		};
 
-		IdentityResult identityResult = await adminManager.CreateAsync(admin, request.Password);
+		IdentityResult identityResult;
+		try
+		{
+			identityResult = await adminManager.CreateAsync(admin, request.Password);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(
+				ex,
+				"RegisterAdmin identity create failed. RequestId: {RequestId}, ErrorName: {ErrorName}, ErrorMessage: {ErrorMessage}",
+				requestId,
+				ex.GetType().Name,
+				ex.Message);
+
+			return new ServiceResponse(StatusCodes.Status500InternalServerError, new
+			{
+				requestId,
+				message = "Failed to create admin account."
+			});
+		}
 		if (!identityResult.Succeeded)
 		{
 			var errors = identityResult.Errors
@@ -52,7 +71,26 @@ public class AuthService
 				errors
 			});
 		}
-		IdentityResult addToRoleResult = await adminManager.AddToRoleAsync(admin, Roles.Admin);
+		IdentityResult addToRoleResult;
+		try
+		{
+			addToRoleResult = await adminManager.AddToRoleAsync(admin, Roles.Admin);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(
+				ex,
+				"RegisterAdmin role assignment threw exception. RequestId: {RequestId}, ErrorName: {ErrorName}, ErrorMessage: {ErrorMessage}",
+				requestId,
+				ex.GetType().Name,
+				ex.Message);
+
+			return new ServiceResponse(StatusCodes.Status500InternalServerError, new
+			{
+				requestId,
+				message = "Failed to assign admin role."
+			});
+		}
 		if (!addToRoleResult.Succeeded)
 		{
 			var errors = addToRoleResult.Errors

@@ -55,15 +55,27 @@ namespace Backend.Controllers
                 return BadRequest(invalidResponse);
             }
 
-            var result = await AuthService.RegisterAdminAsync(request!, userManager, dbContext, _logger, requestId);
+            try
+            {
+                var result = await AuthService.RegisterAdminAsync(request!, userManager, dbContext, _logger, requestId);
 
-            _logger.LogInformation(
-                "RegisterAdmin response. RequestId: {RequestId}, StatusCode: {StatusCode}, ResponseShape: {ResponseShape}",
-                requestId,
-                result.StatusCode,
-                result.Body.GetType().Name);
+                _logger.LogInformation(
+                    "RegisterAdmin response. RequestId: {RequestId}, StatusCode: {StatusCode}, ResponseShape: {ResponseShape}",
+                    requestId,
+                    result.StatusCode,
+                    result.Body?.GetType().Name ?? "null");
 
-            return StatusCode(result.StatusCode, result.Body);
+                return StatusCode(result.StatusCode, result.Body);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "RegisterAdmin unhandled exception. RequestId: {RequestId}", requestId);
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    requestId,
+                    message = "An unexpected error occurred."
+                });
+            }
         }
 
         private static string[] GetSanitizedBodyKeys(AuthService.RegisterAdminRequest? request)

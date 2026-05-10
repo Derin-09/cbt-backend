@@ -105,7 +105,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
-app.Urls.Add($"http://0.0.0.0:{port}");
+var aspNetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+if (string.IsNullOrWhiteSpace(aspNetCoreUrls))
+{
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
+    app.Urls.Add($"http://0.0.0.0:{port}");
+}
 
 app.Run();
