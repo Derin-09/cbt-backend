@@ -1,6 +1,8 @@
 using Backend.Features;
 using Backend.Models;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 string connectionString = builder.Configuration.GetConnectionString("Default") ?? throw new ArgumentNullException("connectionString is null");
 builder.Services.AddControllers();
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendCors", policy =>
@@ -36,6 +42,30 @@ builder.Services.AddSwaggerGen();
 // builder.Services.AddDbContext<ApplicationDbContext>(op => op.UseSqlite(connectionString));
 
 var app = builder.Build();
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var exceptionFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var logger = context.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("GlobalException");
+        var requestId = context.TraceIdentifier;
+
+        logger.LogError(
+            exceptionFeature?.Error,
+            "Unhandled exception. RequestId: {RequestId}, Path: {Path}",
+            requestId,
+            exceptionFeature?.Path ?? context.Request.Path.ToString());
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            requestId,
+            message = "An unexpected error occurred."
+        });
+    });
+});
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -64,9 +94,10 @@ if (app.Environment.IsDevelopment())
     }
 }
 
-
-
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("FrontendCors");
 

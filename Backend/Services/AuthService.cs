@@ -4,9 +4,11 @@ using System;
 namespace Backend.Services;
 
 using Backend.Models;
+using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,13 +17,15 @@ using Microsoft.EntityFrameworkCore;
 
 public class AuthService
 {
+	public record ServiceResponse(int StatusCode, object Body);
+
 	public record RegisterAdminRequest(string FullName, string Password, string Position, string Email);
 	public record RegisterUserRequest(string FullName, string Department, string Password, string MatricNo);
 
 	public record LoginUserRequest(string MatricNo, string Password);
 	public record LoginAdminRequest(string Email, string Password);
 
-	public static async Task<IResult> RegisterAdminAsync(RegisterAdminRequest request, UserManager<AppUser> adminManager, AppDbContext dbContext)
+	public static async Task<ServiceResponse> RegisterAdminAsync(RegisterAdminRequest request, UserManager<AppUser> adminManager, AppDbContext dbContext, ILogger logger, string requestId)
 	{
 		var admin = new AppUser
 		{
@@ -34,22 +38,101 @@ public class AuthService
 		IdentityResult identityResult = await adminManager.CreateAsync(admin, request.Password);
 		if (!identityResult.Succeeded)
 		{
-			return Results.BadRequest(identityResult.Errors);
+			var errors = identityResult.Errors
+				.Select(e => new { e.Code, e.Description })
+				.ToArray();
+
+			bool isConflict = errors.Any(e => e.Code == "DuplicateEmail" || e.Code == "DuplicateUserName");
+			int statusCode = isConflict ? StatusCodes.Status409Conflict : StatusCodes.Status400BadRequest;
+
+			return new ServiceResponse(statusCode, new
+			{
+				requestId,
+				message = "Admin registration failed.",
+				errors
+			});
 		}
 		IdentityResult addToRoleResult = await adminManager.AddToRoleAsync(admin, Roles.Admin);
 		if (!addToRoleResult.Succeeded)
 		{
-			return Results.BadRequest(addToRoleResult.Errors);
+			var errors = addToRoleResult.Errors
+				.Select(e => new { e.Code, e.Description })
+				.ToArray();
+
+			return new ServiceResponse(StatusCodes.Status400BadRequest, new
+			{
+				requestId,
+				message = "Admin role assignment failed.",
+				errors
+			});
 		}
+
 		var adminadd = new Admin
 		{
 			AppUserId = admin.Id,
 			FullName = request.FullName,
 			Position = request.Position
 		};
-		dbContext.Admins.Add(adminadd);
-		await dbContext.SaveChangesAsync();
-		return Results.Ok();
+
+		try
+		{
+			dbContext.Admins.Add(adminadd);
+			await dbContext.SaveChangesAsync();
+		}
+		catch (DbUpdateException ex)
+		{
+			var sqliteEx = ex.InnerException as SqliteException;
+			var dbErrorCode = sqliteEx?.SqliteErrorCode;
+
+			logger.LogError(
+				ex,
+				"RegisterAdmin DB write failed. RequestId: {RequestId}, ErrorName: {ErrorName}, ErrorMessage: {ErrorMessage}, DbErrorCode: {DbErrorCode}, Stack: {Stack}",
+				requestId,
+				ex.GetType().Name,
+				ex.Message,
+				dbErrorCode,
+				ex.StackTrace);
+
+			if (sqliteEx?.SqliteErrorCode == 19)
+			{
+				string constraintMessage = sqliteEx.Message.ToUpperInvariant();
+				if (constraintMessage.Contains("UNIQUE"))
+				{
+					return new ServiceResponse(StatusCodes.Status409Conflict, new
+					{
+						requestId,
+						message = "Admin already exists."
+					});
+				}
+
+				if (constraintMessage.Contains("NOT NULL") || constraintMessage.Contains("CHECK"))
+				{
+					return new ServiceResponse(StatusCodes.Status400BadRequest, new
+					{
+						requestId,
+						message = "Invalid admin data."
+					});
+				}
+
+				return new ServiceResponse(StatusCodes.Status400BadRequest, new
+				{
+					requestId,
+					message = "Database constraint violation."
+				});
+			}
+
+			return new ServiceResponse(StatusCodes.Status500InternalServerError, new
+			{
+				requestId,
+				message = "Failed to store admin details."
+			});
+		}
+
+		return new ServiceResponse(StatusCodes.Status201Created, new
+		{
+			requestId,
+			message = "Admin registered successfully."
+		});
 	}
 
 	public static async Task<IResult> RegisterUserAsync(RegisterUserRequest request, UserManager<AppUser> userManager, AppDbContext dbContext)
