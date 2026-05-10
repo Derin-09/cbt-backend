@@ -105,11 +105,19 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-var aspNetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
-if (string.IsNullOrWhiteSpace(aspNetCoreUrls))
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port))
 {
-    var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
+    app.Urls.Clear();
     app.Urls.Add($"http://0.0.0.0:{port}");
+}
+else
+{
+    var aspNetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+    if (string.IsNullOrWhiteSpace(aspNetCoreUrls))
+    {
+        app.Urls.Add("http://0.0.0.0:3000");
+    }
 }
 
 app.Run();
