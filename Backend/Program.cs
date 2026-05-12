@@ -97,6 +97,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("FrontendCors");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

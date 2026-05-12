@@ -31,3 +31,14 @@ Content-Type: application/json
   "email": "ayoadesanni@gmail.com",
   "password": "Ayoade00!"
 }
+
+
+###
+GET {{base_address}}/login/admin
+Content-Type: application/json
+
+{
+  "email": "ayoadesanni@gmail.com",
+  "password": "Ayoade00!"
+}
+

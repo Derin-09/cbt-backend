@@ -207,32 +207,38 @@ public class AuthService
 		return Results.Ok();
 	}
 
-	public static async Task<IResult> LoginUserAsync(LoginUserRequest user, UserManager<AppUser> userManager)
+	public static async Task<IResult> LoginUserAsync(LoginUserRequest user, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
 	{
 		var founduser = await userManager.FindByNameAsync(user.MatricNo);
 		if (founduser == null)
 		{
 			return Results.NotFound();
 		}
-		var isPasswordValid = await userManager.CheckPasswordAsync(founduser, user.Password);
-		if (!isPasswordValid)
+
+		var signInResult = await signInManager.CheckPasswordSignInAsync(founduser, user.Password, lockoutOnFailure: false);
+		if (!signInResult.Succeeded)
 		{
 			return Results.NotFound();
 		}
+
+		await signInManager.SignInAsync(founduser, isPersistent: false);
 		return Results.Ok();
 	}
-	public static async Task<IResult> LoginAdminAsync(LoginAdminRequest user, UserManager<AppUser> userManager)
+	public static async Task<IResult> LoginAdminAsync(LoginAdminRequest user, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
 	{
 		var founduser = await userManager.FindByNameAsync(user.Email);
 		if (founduser == null)
 		{
 			return Results.NotFound();
 		}
-		var isPasswordValid = await userManager.CheckPasswordAsync(founduser, user.Password);
-		if (!isPasswordValid)
+
+		var signInResult = await signInManager.CheckPasswordSignInAsync(founduser, user.Password, lockoutOnFailure: false);
+		if (!signInResult.Succeeded)
 		{
 			return Results.NotFound();
 		}
+
+		await signInManager.SignInAsync(founduser, isPersistent: false);
 		return Results.Ok();
 	}
 

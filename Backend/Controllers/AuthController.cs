@@ -1,5 +1,6 @@
 using Backend.Models;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -163,17 +164,17 @@ namespace Backend.Controllers
 
         [HttpPost("login/student")]
 
-        public async Task<IActionResult> LoginUser([FromBody] AuthService.LoginUserRequest request, [FromServices] UserManager<AppUser> userManager)
+        public async Task<IActionResult> LoginUser([FromBody] AuthService.LoginUserRequest request, [FromServices] UserManager<AppUser> userManager, [FromServices] SignInManager<AppUser> signInManager)
         {
-            var result = await AuthService.LoginUserAsync(request, userManager);
+            var result = await AuthService.LoginUserAsync(request, userManager, signInManager);
             return await ExecuteResultAsync(result);
         }
 
         [HttpPost("login/admin")]
 
-        public async Task<IActionResult> LoginAdmin([FromBody] AuthService.LoginAdminRequest request, [FromServices] UserManager<AppUser> userManager)
+        public async Task<IActionResult> LoginAdmin([FromBody] AuthService.LoginAdminRequest request, [FromServices] UserManager<AppUser> userManager, [FromServices] SignInManager<AppUser> signInManager)
         {
-            var result = await AuthService.LoginAdminAsync(request, userManager);
+            var result = await AuthService.LoginAdminAsync(request, userManager, signInManager);
             return await ExecuteResultAsync(result);
         }
 
@@ -181,6 +182,31 @@ namespace Backend.Controllers
         {
             await result.ExecuteAsync(HttpContext);
             return new EmptyResult();
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe([FromServices] UserManager<AppUser> userManager)
+        {
+            var currentUser = await userManager.GetUserAsync(User);
+            if (currentUser is null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
+
+            var roles = await userManager.GetRolesAsync(currentUser);
+            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.AppUserId == currentUser.Id);
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.AppUserId == currentUser.Id);
+
+            return Ok(new
+            {
+                appUserId = currentUser.Id,
+                userName = currentUser.Email,
+                fullName = currentUser.FullName,
+                roles,
+                adminId = admin?.Id,
+                studentId = student?.Id
+            });
         }
 
        public class AdminDto
