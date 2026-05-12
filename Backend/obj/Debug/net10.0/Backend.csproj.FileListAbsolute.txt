@@ -155,7 +155,6 @@ C:\Users\HP\Documents\cbt-environment\Backend\bin\Debug\net10.0\Swashbuckle.AspN
 C:\Users\USER\Documents\code\cbt-backend\Backend\bin\Debug\net10.0\appsettings.Development.json
 C:\Users\USER\Documents\code\cbt-backend\Backend\bin\Debug\net10.0\appsettings.json
 C:\Users\USER\Documents\code\cbt-backend\Backend\bin\Debug\net10.0\Backend.staticwebassets.endpoints.json
-C:\Users\USER\Documents\code\cbt-backend\Backend\bin\Debug\net10.0\Backend.exe
 C:\Users\USER\Documents\code\cbt-backend\Backend\bin\Debug\net10.0\Backend.deps.json
 C:\Users\USER\Documents\code\cbt-backend\Backend\bin\Debug\net10.0\Backend.runtimeconfig.json
 C:\Users\USER\Documents\code\cbt-backend\Backend\bin\Debug\net10.0\Backend.dll
@@ -306,3 +305,4 @@ C:\Users\USER\Documents\code\cbt-backend\Backend\obj\Debug\net10.0\refint\Backen
 C:\Users\USER\Documents\code\cbt-backend\Backend\obj\Debug\net10.0\Backend.pdb
 C:\Users\USER\Documents\code\cbt-backend\Backend\obj\Debug\net10.0\Backend.genruntimeconfig.cache
 C:\Users\USER\Documents\code\cbt-backend\Backend\obj\Debug\net10.0\ref\Backend.dll
+C:\Users\USER\Documents\code\cbt-backend\Backend\bin\Debug\net10.0\Backend.exe

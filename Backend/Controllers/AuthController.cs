@@ -158,12 +158,7 @@ namespace Backend.Controllers
         public async Task<IActionResult> RegisterUser([FromBody] AuthService.RegisterUserRequest request, [FromServices] UserManager<AppUser> userManager, AppDbContext dbContext)
         {
             var result = await AuthService.RegisterUserAsync(request, userManager, dbContext);
-            if (result is Microsoft.AspNetCore.Http.HttpResults.Ok)
-                return Ok();
-            if (result is Microsoft.AspNetCore.Http.HttpResults.BadRequest badRequest)
-                return BadRequest(badRequest);
-            // Add more mappings as needed
-            return StatusCode(500, "Unknown result type");
+            return await ExecuteResultAsync(result);
         }
 
         [HttpPost("login/student")]
@@ -171,12 +166,7 @@ namespace Backend.Controllers
         public async Task<IActionResult> LoginUser([FromBody] AuthService.LoginUserRequest request, [FromServices] UserManager<AppUser> userManager)
         {
             var result = await AuthService.LoginUserAsync(request, userManager);
-            if (result is Microsoft.AspNetCore.Http.HttpResults.Ok)
-                return Ok();
-            if (result is Microsoft.AspNetCore.Http.HttpResults.BadRequest badRequest)
-                return BadRequest(badRequest);
-            // Add more mappings as needed
-            return StatusCode(500, "Unknown result type");
+            return await ExecuteResultAsync(result);
         }
 
         [HttpPost("login/admin")]
@@ -184,12 +174,13 @@ namespace Backend.Controllers
         public async Task<IActionResult> LoginAdmin([FromBody] AuthService.LoginAdminRequest request, [FromServices] UserManager<AppUser> userManager)
         {
             var result = await AuthService.LoginAdminAsync(request, userManager);
-            if (result is Microsoft.AspNetCore.Http.HttpResults.Ok)
-                return Ok();
-            if (result is Microsoft.AspNetCore.Http.HttpResults.BadRequest badRequest)
-                return BadRequest(badRequest);
-            // Add more mappings as needed
-            return StatusCode(500, "Unknown result type");
+            return await ExecuteResultAsync(result);
+        }
+
+        private async Task<IActionResult> ExecuteResultAsync(IResult result)
+        {
+            await result.ExecuteAsync(HttpContext);
+            return new EmptyResult();
         }
 
        public class AdminDto
