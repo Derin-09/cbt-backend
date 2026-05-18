@@ -207,39 +207,146 @@ public class AuthService
 		return Results.Ok();
 	}
 
-	public static async Task<IResult> LoginUserAsync(LoginUserRequest user, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+	public static async Task<ServiceResponse> LoginUserAsync(LoginUserRequest? user, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ILogger logger, string requestId)
 	{
-		var founduser = await userManager.FindByNameAsync(user.MatricNo);
-		if (founduser == null)
+		if (user is null)
 		{
-			return Results.NotFound();
+			return new ServiceResponse(StatusCodes.Status400BadRequest, new
+			{
+				requestId,
+				message = "Request body is required."
+			});
 		}
 
-		var signInResult = await signInManager.CheckPasswordSignInAsync(founduser, user.Password, lockoutOnFailure: false);
-		if (!signInResult.Succeeded)
+		var errors = new Dictionary<string, string[]>();
+		if (string.IsNullOrWhiteSpace(user.MatricNo))
 		{
-			return Results.NotFound();
+			errors[nameof(user.MatricNo)] = new[] { "MatricNo is required." };
+		}
+		if (string.IsNullOrWhiteSpace(user.Password))
+		{
+			errors[nameof(user.Password)] = new[] { "Password is required." };
 		}
 
-		await signInManager.SignInAsync(founduser, isPersistent: false);
-		return Results.Ok();
+		if (errors.Count > 0)
+		{
+			return new ServiceResponse(StatusCodes.Status400BadRequest, new
+			{
+				requestId,
+				message = "Validation failed.",
+				errors
+			});
+		}
+
+		try
+		{
+			var founduser = await userManager.FindByNameAsync(user.MatricNo.Trim());
+			if (founduser == null)
+			{
+				return new ServiceResponse(StatusCodes.Status401Unauthorized, new
+				{
+					requestId,
+					message = "Invalid credentials."
+				});
+			}
+
+			var signInResult = await signInManager.CheckPasswordSignInAsync(founduser, user.Password, lockoutOnFailure: false);
+			if (!signInResult.Succeeded)
+			{
+				return new ServiceResponse(StatusCodes.Status401Unauthorized, new
+				{
+					requestId,
+					message = "Invalid credentials."
+				});
+			}
+
+			await signInManager.SignInAsync(founduser, isPersistent: false);
+			return new ServiceResponse(StatusCodes.Status200OK, new
+			{
+				requestId,
+				message = "Student login successful."
+			});
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, "LoginUser failed. RequestId: {RequestId}", requestId);
+			return new ServiceResponse(StatusCodes.Status500InternalServerError, new
+			{
+				requestId,
+				message = "Login failed due to a server error."
+			});
+		}
 	}
-	public static async Task<IResult> LoginAdminAsync(LoginAdminRequest user, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+
+	public static async Task<ServiceResponse> LoginAdminAsync(LoginAdminRequest? user, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ILogger logger, string requestId)
 	{
-		var founduser = await userManager.FindByNameAsync(user.Email);
-		if (founduser == null)
+		if (user is null)
 		{
-			return Results.NotFound();
+			return new ServiceResponse(StatusCodes.Status400BadRequest, new
+			{
+				requestId,
+				message = "Request body is required."
+			});
 		}
 
-		var signInResult = await signInManager.CheckPasswordSignInAsync(founduser, user.Password, lockoutOnFailure: false);
-		if (!signInResult.Succeeded)
+		var errors = new Dictionary<string, string[]>();
+		if (string.IsNullOrWhiteSpace(user.Email))
 		{
-			return Results.NotFound();
+			errors[nameof(user.Email)] = new[] { "Email is required." };
+		}
+		if (string.IsNullOrWhiteSpace(user.Password))
+		{
+			errors[nameof(user.Password)] = new[] { "Password is required." };
 		}
 
-		await signInManager.SignInAsync(founduser, isPersistent: false);
-		return Results.Ok();
+		if (errors.Count > 0)
+		{
+			return new ServiceResponse(StatusCodes.Status400BadRequest, new
+			{
+				requestId,
+				message = "Validation failed.",
+				errors
+			});
+		}
+
+		try
+		{
+			var founduser = await userManager.FindByNameAsync(user.Email.Trim());
+			if (founduser == null)
+			{
+				return new ServiceResponse(StatusCodes.Status401Unauthorized, new
+				{
+					requestId,
+					message = "Invalid credentials."
+				});
+			}
+
+			var signInResult = await signInManager.CheckPasswordSignInAsync(founduser, user.Password, lockoutOnFailure: false);
+			if (!signInResult.Succeeded)
+			{
+				return new ServiceResponse(StatusCodes.Status401Unauthorized, new
+				{
+					requestId,
+					message = "Invalid credentials."
+				});
+			}
+
+			await signInManager.SignInAsync(founduser, isPersistent: false);
+			return new ServiceResponse(StatusCodes.Status200OK, new
+			{
+				requestId,
+				message = "Admin login successful."
+			});
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, "LoginAdmin failed. RequestId: {RequestId}", requestId);
+			return new ServiceResponse(StatusCodes.Status500InternalServerError, new
+			{
+				requestId,
+				message = "Login failed due to a server error."
+			});
+		}
 	}
 
 	public static async Task<IResult> GetStudentsAsync(AppDbContext dbContext)

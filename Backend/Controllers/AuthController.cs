@@ -164,18 +164,36 @@ namespace Backend.Controllers
 
         [HttpPost("login/student")]
 
-        public async Task<IActionResult> LoginUser([FromBody] AuthService.LoginUserRequest request, [FromServices] UserManager<AppUser> userManager, [FromServices] SignInManager<AppUser> signInManager)
+        public async Task<IActionResult> LoginUser([FromBody] AuthService.LoginUserRequest? request, [FromServices] UserManager<AppUser> userManager, [FromServices] SignInManager<AppUser> signInManager)
         {
-            var result = await AuthService.LoginUserAsync(request, userManager, signInManager);
-            return await ExecuteResultAsync(result);
+            string requestId = Guid.NewGuid().ToString("N");
+            HttpContext.Items["RequestId"] = requestId;
+
+            var result = await AuthService.LoginUserAsync(request, userManager, signInManager, _logger, requestId);
+            _logger.LogInformation(
+                "LoginUser response. RequestId: {RequestId}, StatusCode: {StatusCode}, ResponseShape: {ResponseShape}",
+                requestId,
+                result.StatusCode,
+                result.Body?.GetType().Name ?? "null");
+
+            return StatusCode(result.StatusCode, result.Body);
         }
 
         [HttpPost("login/admin")]
 
-        public async Task<IActionResult> LoginAdmin([FromBody] AuthService.LoginAdminRequest request, [FromServices] UserManager<AppUser> userManager, [FromServices] SignInManager<AppUser> signInManager)
+        public async Task<IActionResult> LoginAdmin([FromBody] AuthService.LoginAdminRequest? request, [FromServices] UserManager<AppUser> userManager, [FromServices] SignInManager<AppUser> signInManager)
         {
-            var result = await AuthService.LoginAdminAsync(request, userManager, signInManager);
-            return await ExecuteResultAsync(result);
+            string requestId = Guid.NewGuid().ToString("N");
+            HttpContext.Items["RequestId"] = requestId;
+
+            var result = await AuthService.LoginAdminAsync(request, userManager, signInManager, _logger, requestId);
+            _logger.LogInformation(
+                "LoginAdmin response. RequestId: {RequestId}, StatusCode: {StatusCode}, ResponseShape: {ResponseShape}",
+                requestId,
+                result.StatusCode,
+                result.Body?.GetType().Name ?? "null");
+
+            return StatusCode(result.StatusCode, result.Body);
         }
 
         private async Task<IActionResult> ExecuteResultAsync(IResult result)

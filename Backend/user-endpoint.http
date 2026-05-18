@@ -28,17 +28,17 @@ POST {{base_address}}/login/admin
 Content-Type: application/json
 
 {
-  "email": "ayoadesanni@gmail.com",
-  "password": "Ayoade00!"
+  "email": "yetimay@gmail.com",
+  "password": "YetiMay00!"
 }
 
 
 ###
-GET {{base_address}}/login/admin
+POST {{base_address}}/login/student
 Content-Type: application/json
 
 {
-  "email": "ayoadesanni@gmail.com",
-  "password": "Ayoade00!"
+  "matricNo": "1234/5678",
+  "password": "Marshall00!"
 }
 

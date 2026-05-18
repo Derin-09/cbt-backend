@@ -9,6 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 string connectionString = builder.Configuration.GetConnectionString("Default") ?? throw new ArgumentNullException("connectionString is null");
+var sqliteDbPath = builder.Configuration["SQLITE_DB_PATH"];
+if (!string.IsNullOrWhiteSpace(sqliteDbPath))
+{
+    var fullSqlitePath = Path.GetFullPath(sqliteDbPath);
+    var sqliteDirectory = Path.GetDirectoryName(fullSqlitePath);
+    if (!string.IsNullOrWhiteSpace(sqliteDirectory))
+    {
+        Directory.CreateDirectory(sqliteDirectory);
+    }
+
+    connectionString = $"Data Source={fullSqlitePath}";
+}
 builder.Services.AddControllers();
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
