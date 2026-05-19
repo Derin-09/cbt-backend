@@ -9,7 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 string connectionString = builder.Configuration.GetConnectionString("Default") ?? throw new ArgumentNullException("connectionString is null");
-builder.Services.AddControllers();
+// builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler =
+            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
@@ -94,10 +100,10 @@ if (app.Environment.IsDevelopment())
     }
 }
 
-if (app.Environment.IsDevelopment())
-{
+// if (app.Environment.IsDevelopment())
+// {
     app.UseHttpsRedirection();
-}
+// }
 
 app.UseCors("FrontendCors");
 
